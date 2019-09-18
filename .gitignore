@@ -1,0 +1,4 @@
+*.exe
+*.bak
+*.pyc
+*.vscode
