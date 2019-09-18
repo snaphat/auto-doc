@@ -1,0 +1,1 @@
+example resource file for demonstration purposes
