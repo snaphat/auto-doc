@@ -5,7 +5,7 @@ import os                 #fs stat and path check.
 import re                 #regex.
 import shutil             #move and copy files.
 import string             #for string replacal.
-import StringIO           #for redirecting stdout and stderr.
+import io                 #for redirecting stdout and stderr.
 import subprocess         #run a subprocess.
 import sys                #various system functions.
 import tempfile           #for temporary directories.
@@ -108,7 +108,7 @@ class autodoc:
 
         #Swap standard error to a string.
         orig_stderr = sys.stderr;
-        sys.stderr = str_stderr = StringIO.StringIO();
+        sys.stderr = str_stderr = io.StringIO();
 
         #Call the original exception handler.
         sys.__excepthook__(type, value, traceback);
@@ -144,8 +144,8 @@ class autodoc:
             trace = trace.replace(replacal, RED + match.group(0) + RESET);
 
         #Print colored trace.
-        print "\nUnhandled exception:"
-        print trace;
+        print("\nUnhandled exception:")
+        print(trace);
 
         #Call our exit method.
         autodoc.exit();
@@ -236,14 +236,14 @@ class autodoc:
         if (os.path.exists(path)):
         #{
             #Exists.
-            print GREEN + "found" + RESET + ".";
+            print(GREEN + "found" + RESET + ".");
             return path;
         #}
         else:
         #{
             #Doesn't exist.
             autodoc.error = True;
-            print RED + "NOT found" + RESET + ".";
+            print(RED + "NOT found" + RESET + ".");
         #}
     #}
 
@@ -268,7 +268,7 @@ class autodoc:
         #}
         except Exception as e:
         #{
-            print CYAN + filename + RED + ":" + RED + " Failed to backup binary (" + e.strerror + ")!";
+            print(CYAN + filename + RED + ":" + RED + " Failed to backup binary (" + e.strerror + ")!");
             autodoc.escalate_admin();
             return False;
         #}
@@ -313,13 +313,13 @@ class autodoc:
                 #}
                 except Exception as e:
                 #{
-                    print CYAN + filename + RED + ":" + RED + " Failed to move backup in place (" + e.strerror + ")!";
+                    print(CYAN + filename + RED + ":" + RED + " Failed to move backup in place (" + e.strerror + ")!");
                     return False;
                 #}
             #}
             else:
             #{
-                print CYAN + filename + RED + ":" + RED + " Failed to move backup in place (" + e.strerror + ")!";
+                print(CYAN + filename + RED + ":" + RED + " Failed to move backup in place (" + e.strerror + ")!");
                 autodoc.escalate_admin();
 
                 #Set the path to the current directory.
@@ -344,7 +344,7 @@ class autodoc:
         #{
             #Print information if specified.
             if(bPrintInfo):
-                print CYAN + filename + RED + ":" + RESET + " Reversing backup...";
+                print(CYAN + filename + RED + ":" + RESET + " Reversing backup...");
 
             #Reverse the backup.
             if(autodoc.reverse_backup(filename)):
@@ -370,7 +370,7 @@ class autodoc:
     @staticmethod
     def create_task():
     #{
-        print "Scheduling task...";
+        print("Scheduling task...");
 
         #Get executable path and name combination.
         if(hasattr(sys, "frozen")):
@@ -383,7 +383,7 @@ class autodoc:
         #Make taskname.
         taskName = "Auto-Doc Healer [" + os.path.basename(os.getcwd()) + "]";
 
-        print
+        print()
         #Schedule task.
         retCode = subprocess.Popen("schtasks /Create /F /TN \""+ taskName + "\" /TR \"'" + executable + "' --silent\" /SC ONSTART /RU " + getpass.getuser() + " /RP").wait();
 
@@ -400,12 +400,12 @@ class autodoc:
     @staticmethod
     def delete_task():
     #{
-        print "Deleting task...";
+        print("Deleting task...");
 
         #Make taskname.
         taskName = "Auto-Doc Healer [" + os.path.basename(os.getcwd()) + "]";
 
-        print
+        print()
         #Delete task.
         CREATE_NO_WINDOW=0x08000000;
         subprocess.Popen("schtasks /Delete /F /TN \""+ taskName, creationflags=CREATE_NO_WINDOW).wait();
@@ -466,7 +466,7 @@ class autodoc:
             if (autodoc.check_argument("cretask", "createtask")):
             #{
                 autodoc.create_task();
-                print;
+                print();
                 autodoc.exit();
             #}
 
@@ -546,7 +546,7 @@ class autodoc:
         #Print stage info for debugging purposes.
         if(autodoc.enableSimulation):
         #{
-            print RED + "~~~~~~~~~~" + WHITE + " Setup Stage " + RED + "~~~~~~~~~~\n" + RESET;
+            print(RED + "~~~~~~~~~~" + WHITE + " Setup Stage " + RED + "~~~~~~~~~~\n" + RESET);
         #}
 
         retCode = 0;
@@ -628,7 +628,7 @@ class autodoc:
         #Print stage info for debugging purposes.
         if(autodoc.enableSimulation):
         #{
-            print RED + "~~~~~~~~~" + WHITE + " Teardown Stage " + RED + "~~~~~~~~\n" + RESET;
+            print(RED + "~~~~~~~~~" + WHITE + " Teardown Stage " + RED + "~~~~~~~~\n" + RESET);
         #}
 
         if (not autodoc.reversing and not autodoc.enableSimulation
@@ -654,7 +654,7 @@ class autodoc:
               and not autodoc.error and autodoc.found and os.name == "nt"):
         #{
             try:
-                userInput = raw_input("Do you want to schedule " + CYAN + "Auto" + RED + "-" + CYAN + "Doc" + RESET + " to be run \nas a Windows Task on system startup? [no] ");
+                userInput = input("Do you want to schedule " + CYAN + "Auto" + RED + "-" + CYAN + "Doc" + RESET + " to be run \nas a Windows Task on system startup? [no] ");
             except:
                 userInput = "";
                 pass; #fix crash issues with ctrl-C and ctrl-Z on windows.
@@ -688,11 +688,11 @@ class autodoc:
             #Success
 
             display.info("Everything appears to have gone successfully!");
-            print    RED +  "\t\t         ::."
-            print    WHITE +  "\t\t  (\\./)  .-\"\"-."
-            print            "\t\t   `\\'-'`      \\"
-            print              "\t\t     '.___" + YELLOW + "," + WHITE + "_" + RED + "^" + WHITE + "__/" + RESET;
-            print "\t You may have to logout or reboot...\n"
+            print(RED +  "\t\t         ::.")
+            print(WHITE +  "\t\t  (\\./)  .-\"\"-.")
+            print("\t\t   `\\'-'`      \\")
+            print("\t\t     '.___" + YELLOW + "," + WHITE + "_" + RED + "^" + WHITE + "__/" + RESET);
+            print("\t You may have to logout or reboot...\n")
         #}
 
         #Check if any binaries were found.
@@ -741,7 +741,7 @@ class autodoc:
         if(not autodoc.enableSilence):
         #{
             try:
-                raw_input("Press Enter to exit...");
+                input("Press Enter to exit...");
             except:
                 pass; #fix crash issues with ctrl-C and ctrl-Z on windows.
         #}
@@ -859,7 +859,7 @@ class binary:
     def compare_time(self, other):
     #{
         #Get the time.
-        os.stat_float_times(False);
+        os.stat(False);
 
         newTime = os.path.getmtime(self.filename);
         oldTime = os.path.getmtime(other.filename);
@@ -899,7 +899,7 @@ class binary:
         if (self.copyDir == False and self.rename == False):
         #{
             #Add backup, error out on creation failure.
-            print CYAN + self.filename + RED + ":" + RESET + " Creating backup binary...";
+            print(CYAN + self.filename + RED + ":" + RESET + " Creating backup binary...");
             if(not autodoc.add_backup(self.filename)):
             #{
                 self.error = True;
@@ -909,7 +909,7 @@ class binary:
         else:
         #{
             #Add copy, error out on creation failure.
-            print CYAN + self.filename + RED + ":" + RESET + " Creating copy of binary...";
+            print(CYAN + self.filename + RED + ":" + RESET + " Creating copy of binary...");
             try:
             #{
                 path = "";
@@ -935,7 +935,7 @@ class binary:
             #}
             except Exception as e:
             #{
-                print CYAN + self.filename + RED + ":" + RED + " Failed to copy binary (" + str(e) + ")!";
+                print(CYAN + self.filename + RED + ":" + RED + " Failed to copy binary (" + str(e) + ")!");
                 autodoc.escalate_admin();
                 self.error = True;
                 return;
@@ -943,7 +943,7 @@ class binary:
         #}
 
         #Write the new binary.
-        print CYAN + self.filename + RED + ":" + RESET + " Creating patched binary...";
+        print(CYAN + self.filename + RED + ":" + RESET + " Creating patched binary...");
         try:
         #{
             file = open(self.filename, "wb+");
@@ -954,7 +954,7 @@ class binary:
         #}
         except Exception as e:
         #{
-            print CYAN + self.filename + RED + ":" + RED + " Failed to write binary (" + e.strerror + ")!";
+            print(CYAN + self.filename + RED + ":" + RED + " Failed to write binary (" + e.strerror + ")!");
             autodoc.escalate_admin();
             self.error = True;
             return;
@@ -996,15 +996,15 @@ class binary:
         #Check for no or multiple matches.
         if (len(list)) == 0:
         #{
-            print CYAN + self.filename + RED + ":" + RED + " Error, missing segment" + RESET + "!";
+            print(CYAN + self.filename + RED + ":" + RED + " Error, missing segment" + RESET + "!");
             self.error = True;
             return 0;
         #}
         elif (len(list) > 1):
         #{
-            print CYAN + self.filename + RED + ":" + RED + " Error, incorrect segment count" + RESET + "!";
+            print(CYAN + self.filename + RED + ":" + RED + " Error, incorrect segment count" + RESET + "!");
             self.error = True;
-            print list
+            print(list)
             return 0;
         #}
 
@@ -1062,7 +1062,7 @@ class binary:
             if(offsetRange == None):
             #{
                 previousPosition = -1;
-                endPosition = sys.maxint;
+                endPosition = sys.maxsize;
             #}
             else:
             #{
@@ -1088,12 +1088,12 @@ class binary:
         #error if no match was found or the count of found matches was off.
         if (not bFoundMatch):
         #{
-            print CYAN + self.filename + RED + ":" + RED + " Error, missing segment" + RESET + "!";
+            print(CYAN + self.filename + RED + ":" + RED + " Error, missing segment" + RESET + "!");
             self.error = True;
         #}
         elif (-1 not in allowedDuplicateCount and currentDuplicateCount not in allowedDuplicateCount):
         #{
-            print CYAN + self.filename + RED + ":" + RED + " Error, incorrect segment count" + RESET + "!";
+            print(CYAN + self.filename + RED + ":" + RED + " Error, incorrect segment count" + RESET + "!");
             self.error = True;
         #}
     #}
@@ -1161,13 +1161,13 @@ class binary:
         #{
             #Record changes for printing.
             originalBytes += "%02X" % self.buffer[positionToModify+index];
-            modifiedBytes += "%02X" % ord(byte);
+            modifiedBytes += "%02X" % byte;
 
             #Actually do changes.
             self.buffer[positionToModify+index] = byte;
         #}
 
-        print CYAN + self.filename + RED + ":" + RESET + " Modifying address " + YELLOW + "0x%02X" % positionToModify + RESET + " from " + CYAN + "0x" + originalBytes + RESET + " ==> " + CYAN + "0x" + modifiedBytes + RESET + ".";
+        print(CYAN + self.filename + RED + ":" + RESET + " Modifying address " + YELLOW + "0x%02X" % positionToModify + RESET + " from " + CYAN + "0x" + originalBytes + RESET + " ==> " + CYAN + "0x" + modifiedBytes + RESET + ".");
     #}
 
     ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1187,7 +1187,7 @@ class binary:
         #Print stage info for debugging purposes.
         if(autodoc.enableSimulation):
         #{
-            print RED + "~~~~~~~~" + WHITE + " Prologue Stage " + RED + "~~~~~~~~~\n" + RESET;
+            print(RED + "~~~~~~~~" + WHITE + " Prologue Stage " + RED + "~~~~~~~~~\n" + RESET);
         #}
 
         autodoc.found = True;
@@ -1196,7 +1196,7 @@ class binary:
         if (not autodoc.reversing and self.hasBackup and not self.forceReplaceBackup):
         #{
             #Already exists.
-            print CYAN + self.filename + RED + ":" + RESET + " Backup binary already exists...";
+            print(CYAN + self.filename + RED + ":" + RESET + " Backup binary already exists...");
             display.separator();
             return False;
         #}
@@ -1216,11 +1216,11 @@ class binary:
             #Print stage info for debugging purposes.
             if(autodoc.enableSimulation):
             #{
-                print RED + "~~~~~~" + WHITE + " Modification Stage " + RED + "~~~~~~~\n" + RESET;
+                print(RED + "~~~~~~" + WHITE + " Modification Stage " + RED + "~~~~~~~\n" + RESET);
             #}
 
             #Read the file into memory.
-            print CYAN + self.filename + RED + ":" + RESET + " Attempting modifications...";
+            print(CYAN + self.filename + RED + ":" + RESET + " Attempting modifications...");
             self.read_file();
 
             return True;
@@ -1235,7 +1235,7 @@ class binary:
         #Print stage info for debugging purposes.
         if(autodoc.enableSimulation):
         #{
-            print RED + "\n~~~~~~~~" + WHITE + " Epilogue Stage " + RED + "~~~~~~~~~\n" + RESET;
+            print(RED + "\n~~~~~~~~" + WHITE + " Epilogue Stage " + RED + "~~~~~~~~~\n" + RESET);
         #}
         self.write_file();
 
@@ -1289,46 +1289,46 @@ class display:
     @staticmethod
     def version():
     #{
-        print RED + "======" + WHITE + "=====================" + RED + "======" + RESET;
-        print RED + "====" + WHITE + "====" + CYAN + " Auto" + RED + "-" + CYAN + "Doc" + YELLOW + " v7.11 " + WHITE + "=====" + RED + "====";
-        print RED + "======" + WHITE + "=====================" + RED + "======" + RESET;
-        print;
+        print(RED + "======" + WHITE + "=====================" + RED + "======" + RESET);
+        print(RED + "====" + WHITE + "====" + CYAN + " Auto" + RED + "-" + CYAN + "Doc" + YELLOW + " v7.11 " + WHITE + "=====" + RED + "====");
+        print(RED + "======" + WHITE + "=====================" + RED + "======" + RESET);
+        print();
     #}
 
     #Print abort message.
     @staticmethod
     def abort(binary):
     #{
-        print CYAN + binary + RED + ":" + RED + " Aborting modifications" + RESET + "!";
+        print(CYAN + binary + RED + ":" + RED + " Aborting modifications" + RESET + "!");
     #}
 
     #Print success message.
     @staticmethod
     def success(binary):
     #{
-        print CYAN + binary + RED + ":" + GREEN + " Successfully hacked" + RESET + "!";
+        print(CYAN + binary + RED + ":" + GREEN + " Successfully hacked" + RESET + "!");
     #}
 
     #Print a warning message.
     @staticmethod
     def warning(text):
     #{
-        print YELLOW + "Warning" + RED + ": " + RESET + text;
+        print(YELLOW + "Warning" + RED + ": " + RESET + text);
     #}
 
     #Print an info message.
     @staticmethod
     def info(text):
     #{
-        print GREEN + "Info" + RED + ":\t " + RESET + text;
+        print(GREEN + "Info" + RED + ":\t " + RESET + text);
     #}
 
     #Print a separator
     @staticmethod
     def separator():
     #{
-        print;
-        print RED + "======" + WHITE + "=====================" + RED + "======" + RESET;
-        print;
+        print();
+        print(RED + "======" + WHITE + "=====================" + RED + "======" + RESET);
+        print();
     #}
 #}

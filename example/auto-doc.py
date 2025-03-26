@@ -20,7 +20,7 @@ def user_task():
 def before_arguments_run_check_for_resources():
 #{
     # example use of checking for an existing resources under "tools" or "bundled" directory.
-    print(os.getcwd())
+    print((os.getcwd()))
     autodoc.example_resource = autodoc.find_resource("example_resource.txt");
 
     #Make sure all resources exist.
@@ -100,7 +100,7 @@ autodoc.setup(enableService=False, enableSilence=False, enableSimulation=False);
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Below is the general structure used for patching binaries.
-list = ["a.exe"];
+list = ["sample.exe", "sample"];
 for item in list:
 #{
     #The binary to modify
@@ -121,17 +121,19 @@ for item in list:
         #     offset: The offset into the matched text to start replacal at.
         #     bytes:  The bytes to replace the match[offset] with.
         tuple     = [
-                        "\x83...\x75.", # CMP followed by JNZ
-                        4,
-                        "\x74",
+                        b"\x83...\x01\x75.\x48\x8D", # CMP followed by JNZ
+                        5,
+                        b"\x74",
                     ];
 
         # additional alternative patterns can be specified by adding to the tuple.
         tuple    += [
-                        "\x0F\x95.\x88...\x48", # doesn't match within the example executable.
-                        0,
-                        "\x90\x90\x90",
+                        # b"\x83...\x01\x75.\x48\x8D", # CMP followed by JNZ
+                        b"\x83..\x01\x75.\x48\x8D.....\x48", # CMP followed by JNZ
+                        4,
+                        b"\x74",
                     ];
+
         # Instruct auto-doc to attempt to patch the binary.
         # allowedDuplicateCount: indicates the number of times a pattern is allowed to be in the binary for replacal.
         # ignoredDuplicates: used to specify that a specific duplicate be ignored (e.g. [1,4] would indicate match 1 and 4 be ignored).
@@ -141,14 +143,14 @@ for item in list:
 
         # Modification 2
         tuple     = [
-                        "R..ning",
+                        b"R..ning",
                         7,
-                        " Modded!",
+                        b" Modded!",
                     ];
         tuple    += [
-                        "\x85.\x74.\x83..\x77.", # Non-matching random patch.
+                        b"\x85.\x74.\x83..\x77.", # Non-matching random patch.
                         2,
-                        "\x90\x90",
+                        b"\x90\x90",
                     ];
         hack.modify(tuple);
 
